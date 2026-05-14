@@ -12,4 +12,4 @@ Shared for transparency, not as a template. The content (months, tasks, resource
 
 ## Stack
 
-React + Vite + Tailwind CSS, deployed on Netlify. Progress syncs across devices via Firebase Firestore with Google Sign-In.
+React + Vite + Tailwind CSS, deployed at [ai-transition-tracker.netlify.app](https://ai-transition-tracker.netlify.app). Progress syncs across devices via Firebase Firestore with Google Sign-In.
