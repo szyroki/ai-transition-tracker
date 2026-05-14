@@ -20,6 +20,8 @@ import {
   LogIn,
   LogOut,
   Loader2,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -306,7 +308,7 @@ function loadLocalState() {
 
 function ProgressBar({ value, accent = "from-sky-500 to-cyan-400" }) {
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200/80">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-700/80">
       <div
         className={`h-full rounded-full bg-gradient-to-r ${accent} transition-all duration-500`}
         style={{ width: `${value}%` }}
@@ -318,13 +320,13 @@ function ProgressBar({ value, accent = "from-sky-500 to-cyan-400" }) {
 function Section({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-3xl border border-slate-200/80 bg-white/80 shadow-sm shadow-slate-200/60 backdrop-blur">
+    <div className="rounded-3xl border border-slate-200/80 bg-white/80 shadow-sm shadow-slate-200/60 backdrop-blur dark:border-slate-700/60 dark:bg-slate-800/80 dark:shadow-slate-900/40">
       <button
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between px-5 py-4 text-left"
       >
-        <h3 className="text-sm font-semibold tracking-tight text-slate-900 md:text-base">{title}</h3>
-        <span className="rounded-full bg-slate-100 p-1 text-slate-500">
+        <h3 className="text-sm font-semibold tracking-tight text-slate-900 md:text-base dark:text-slate-100">{title}</h3>
+        <span className="rounded-full bg-slate-100 p-1 text-slate-500 dark:bg-slate-700 dark:text-slate-400">
           {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </span>
       </button>
@@ -338,13 +340,13 @@ function ChecklistItem({ item, checked, onToggle }) {
     <button
       onClick={onToggle}
       className={`group flex w-full gap-3 rounded-2xl px-3 py-3 text-left transition ${
-        checked ? "bg-emerald-50/70" : "hover:bg-slate-50"
+        checked ? "bg-emerald-50/70 dark:bg-emerald-900/20" : "hover:bg-slate-50 dark:hover:bg-slate-700/50"
       }`}
     >
-      <span className={`mt-0.5 ${checked ? "text-emerald-600" : "text-slate-300 group-hover:text-slate-500"}`}>
+      <span className={`mt-0.5 ${checked ? "text-emerald-600" : "text-slate-300 group-hover:text-slate-500 dark:text-slate-600 dark:group-hover:text-slate-400"}`}>
         {checked ? <CheckCircle2 size={20} /> : <Circle size={20} />}
       </span>
-      <span className={`text-sm leading-6 ${checked ? "text-slate-500 line-through" : "text-slate-700"}`}>
+      <span className={`text-sm leading-6 ${checked ? "text-slate-500 line-through dark:text-slate-500" : "text-slate-700 dark:text-slate-300"}`}>
         {item.label}
       </span>
     </button>
@@ -356,8 +358,18 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const stored = localStorage.getItem("darkMode");
+    if (stored !== null) return stored === "true";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
   const stateRef = useRef(state);
   const saveTimer = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("darkMode", darkMode);
+  }, [darkMode]);
 
   stateRef.current = state;
 
@@ -475,37 +487,44 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#e0f2fe_0,#f8fafc_34%,#f8fafc_100%)] text-slate-900">
-      <header className="border-b border-white/70 bg-white/75 backdrop-blur-xl">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#e0f2fe_0,#f8fafc_34%,#f8fafc_100%)] text-slate-900 dark:bg-[radial-gradient(circle_at_top_left,#0f172a_0,#0f172a_100%)] dark:text-slate-100">
+      <header className="border-b border-white/70 bg-white/75 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
         <div className="mx-auto max-w-7xl px-5 py-7 md:py-9">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400">
                 <Sparkles size={14} className="text-sky-500" /> Private learning dashboard
               </div>
-              <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-slate-950 md:text-5xl">
+              <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-slate-950 md:text-5xl dark:text-white">
                 AI implementation transition tracker
               </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-400">
                 Six months of focused work: technical credibility, enterprise AI plumbing, RAG, evaluation, and portfolio proof — without drifting into developer cosplay.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={exportJson}
-                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 <Download size={16} /> Export
               </button>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
                 <Download size={16} className="rotate-180" /> Import
                 <input type="file" accept="application/json,.json" onChange={importJson} className="hidden" />
               </label>
               <button
                 onClick={reset}
-                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 <RotateCcw size={16} /> Reset
+              </button>
+              <button
+                onClick={() => setDarkMode((d) => !d)}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {darkMode ? <Sun size={16} /> : <Moon size={16} />}
               </button>
 
               {/* Auth button */}
@@ -514,7 +533,7 @@ export default function App() {
                   <Loader2 size={16} className="animate-spin" />
                 </div>
               ) : user ? (
-                <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm">
+                <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
                   {syncing ? (
                     <Loader2 size={16} className="animate-spin text-sky-500" />
                   ) : (
@@ -523,7 +542,7 @@ export default function App() {
                   <span className="hidden sm:inline">{user.displayName?.split(" ")[0]}</span>
                   <button
                     onClick={handleSignOut}
-                    className="ml-1 text-slate-400 transition hover:text-slate-700"
+                    className="ml-1 text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-200"
                     title="Sign out"
                   >
                     <LogOut size={15} />
@@ -540,17 +559,17 @@ export default function App() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 rounded-3xl border border-white/80 bg-white/70 p-4 shadow-sm shadow-slate-200/70 md:grid-cols-[1fr_180px] md:items-center">
+          <div className="mt-8 grid gap-4 rounded-3xl border border-white/80 bg-white/70 p-4 shadow-sm shadow-slate-200/70 md:grid-cols-[1fr_180px] md:items-center dark:border-slate-700/50 dark:bg-slate-800/70 dark:shadow-slate-900/50">
             <div>
-              <div className="mb-2 flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-500">
+              <div className="mb-2 flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 <span>Overall progress</span>
                 <span>{completedCount}/{totalCount} tasks</span>
               </div>
               <ProgressBar value={overall} accent="from-sky-500 to-violet-500" />
             </div>
             <div className="text-left md:text-right">
-              <div className="text-3xl font-semibold tracking-tight text-slate-950">{overall}%</div>
-              <div className="text-xs text-slate-500">complete</div>
+              <div className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{overall}%</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">complete</div>
             </div>
           </div>
         </div>
@@ -569,8 +588,8 @@ export default function App() {
                 onClick={() => setState((prev) => ({ ...prev, activeMonth: m.id }))}
                 className={`w-full rounded-3xl border p-4 text-left shadow-sm transition duration-200 ${
                   active
-                    ? "border-slate-300 bg-white shadow-slate-200/80"
-                    : "border-white/80 bg-white/60 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:shadow-md"
+                    ? "border-slate-300 bg-white shadow-slate-200/80 dark:border-slate-600 dark:bg-slate-800 dark:shadow-slate-900/80"
+                    : "border-white/80 bg-white/60 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:shadow-md dark:border-slate-700/50 dark:bg-slate-800/50 dark:hover:border-slate-600 dark:hover:bg-slate-800"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -579,49 +598,49 @@ export default function App() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-slate-900">{m.title}</div>
-                      <div className="text-xs font-medium text-slate-400">{pct}%</div>
+                      <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">{m.title}</div>
+                      <div className="text-xs font-medium text-slate-400 dark:text-slate-500">{pct}%</div>
                     </div>
-                    <div className="truncate text-xs text-slate-500">{m.short}</div>
+                    <div className="truncate text-xs text-slate-500 dark:text-slate-400">{m.short}</div>
                   </div>
                 </div>
                 <div className="mt-3">
                   <ProgressBar value={pct} accent={m.accent} />
                 </div>
-                <div className="mt-3 line-clamp-2 text-xs leading-5 text-slate-600">{m.theme}</div>
+                <div className="mt-3 line-clamp-2 text-xs leading-5 text-slate-600 dark:text-slate-400">{m.theme}</div>
               </button>
             );
           })}
         </aside>
 
         <section className="space-y-5">
-          <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-sm shadow-slate-200/70">
+          <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-sm shadow-slate-200/70 dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-slate-900/50">
             <div className={`h-1.5 bg-gradient-to-r ${activeMonth.accent}`} />
             <div className="p-6 md:p-7">
               <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-400">
                     <Icon size={14} /> {activeMonth.title}
                   </div>
-                  <h2 className="max-w-3xl text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
+                  <h2 className="max-w-3xl text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl dark:text-white">
                     {activeMonth.theme}
                   </h2>
-                  <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{activeMonth.positioning}</p>
+                  <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 dark:text-slate-400">{activeMonth.positioning}</p>
                 </div>
-                <div className="min-w-[190px] rounded-3xl border border-slate-100 bg-slate-50 p-4">
-                  <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Month progress</div>
-                  <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">{activeProgress}%</div>
+                <div className="min-w-[190px] rounded-3xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-700/50">
+                  <div className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Month progress</div>
+                  <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{activeProgress}%</div>
                   <div className="mt-3"><ProgressBar value={activeProgress} accent={activeMonth.accent} /></div>
                 </div>
               </div>
-              <div className="mt-6 rounded-3xl border border-slate-100 bg-slate-50/80 p-5">
+              <div className="mt-6 rounded-3xl border border-slate-100 bg-slate-50/80 p-5 dark:border-slate-700 dark:bg-slate-700/40">
                 <div className="flex gap-3">
                   <div className={`h-10 w-10 shrink-0 rounded-2xl bg-gradient-to-br ${activeMonth.accent} p-2.5 text-white`}>
                     <Target size={20} />
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-950">Expected outcome</div>
-                    <p className="mt-1 text-sm leading-7 text-slate-600">{activeMonth.outcome}</p>
+                    <div className="font-semibold text-slate-950 dark:text-white">Expected outcome</div>
+                    <p className="mt-1 text-sm leading-7 text-slate-600 dark:text-slate-400">{activeMonth.outcome}</p>
                   </div>
                 </div>
               </div>
@@ -638,15 +657,15 @@ export default function App() {
                       href={r.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="group block rounded-3xl border border-slate-100 bg-slate-50/70 p-4 transition hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:shadow-md hover:shadow-slate-200/60"
+                      className="group block rounded-3xl border border-slate-100 bg-slate-50/70 p-4 transition hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:shadow-md hover:shadow-slate-200/60 dark:border-slate-700/60 dark:bg-slate-700/40 dark:hover:border-slate-600 dark:hover:bg-slate-700"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <div className="font-semibold text-slate-900">{r.label}</div>
-                        <div className="rounded-full bg-white p-2 text-slate-400 transition group-hover:text-slate-700">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">{r.label}</div>
+                        <div className="rounded-full bg-white p-2 text-slate-400 transition group-hover:text-slate-700 dark:bg-slate-600 dark:text-slate-400 dark:group-hover:text-slate-200">
                           <ExternalLink size={15} />
                         </div>
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">{r.note}</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">{r.note}</p>
                     </a>
                   ))}
                 </div>
@@ -663,9 +682,9 @@ export default function App() {
               <Section title="Deeper notes and guardrails" defaultOpen={false}>
                 <div className="grid gap-3">
                   {activeMonth.deep.map((d, idx) => (
-                    <div key={idx} className="rounded-3xl border border-slate-100 bg-slate-50/80 p-4">
-                      <div className="font-semibold text-slate-900">{d.label}</div>
-                      <p className="mt-1 text-sm leading-7 text-slate-600">{d.text}</p>
+                    <div key={idx} className="rounded-3xl border border-slate-100 bg-slate-50/80 p-4 dark:border-slate-700/60 dark:bg-slate-700/40">
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">{d.label}</div>
+                      <p className="mt-1 text-sm leading-7 text-slate-600 dark:text-slate-400">{d.text}</p>
                     </div>
                   ))}
                 </div>
@@ -673,29 +692,29 @@ export default function App() {
             </div>
 
             <div className="space-y-5">
-              <div className="rounded-3xl border border-white/80 bg-white/85 p-5 shadow-sm shadow-slate-200/70 backdrop-blur">
-                <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <div className="rounded-3xl border border-white/80 bg-white/85 p-5 shadow-sm shadow-slate-200/70 backdrop-blur dark:border-slate-700/50 dark:bg-slate-800/85 dark:shadow-slate-900/50">
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                   <FileText size={18} /> Monthly artifact
                 </div>
-                <h3 className="mt-3 text-xl font-semibold tracking-tight text-slate-950">{activeMonth.artifact.title}</h3>
-                <p className="mt-2 text-sm leading-7 text-slate-600">{activeMonth.artifact.description}</p>
-                <div className="mt-5 text-xs font-medium uppercase tracking-wide text-slate-400">Must include</div>
+                <h3 className="mt-3 text-xl font-semibold tracking-tight text-slate-950 dark:text-white">{activeMonth.artifact.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-400">{activeMonth.artifact.description}</p>
+                <div className="mt-5 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">Must include</div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {activeMonth.artifact.mustInclude.map((x, idx) => (
-                    <span key={idx} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
+                    <span key={idx} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300">
                       {x}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/80 bg-white/85 p-5 shadow-sm shadow-slate-200/70 backdrop-blur">
-                <div className="text-sm font-semibold text-slate-900">Private notes for {activeMonth.title}</div>
+              <div className="rounded-3xl border border-white/80 bg-white/85 p-5 shadow-sm shadow-slate-200/70 backdrop-blur dark:border-slate-700/50 dark:bg-slate-800/85 dark:shadow-slate-900/50">
+                <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">Private notes for {activeMonth.title}</div>
                 <textarea
                   value={state.notes[activeMonth.id] || ""}
                   onChange={(e) => setNote(activeMonth.id, e.target.value)}
                   placeholder="What did you learn? What was hard? What should become a portfolio item?"
-                  className="mt-3 min-h-[180px] w-full resize-y rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm leading-6 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100"
+                  className="mt-3 min-h-[180px] w-full resize-y rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm leading-6 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200 dark:placeholder:text-slate-500 dark:focus:bg-slate-700 dark:focus:ring-sky-900/30"
                 />
               </div>
             </div>
@@ -704,9 +723,9 @@ export default function App() {
           <Section title="Interview answer bank" defaultOpen={false}>
             <div className="grid gap-3">
               {interviewQuestions.map((item, idx) => (
-                <div key={idx} className="rounded-3xl border border-slate-100 bg-slate-50/80 p-4">
-                  <div className="font-semibold text-slate-900">{item.q}</div>
-                  <p className="mt-2 text-sm leading-7 text-slate-600">{item.a}</p>
+                <div key={idx} className="rounded-3xl border border-slate-100 bg-slate-50/80 p-4 dark:border-slate-700/60 dark:bg-slate-700/40">
+                  <div className="font-semibold text-slate-900 dark:text-slate-100">{item.q}</div>
+                  <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-400">{item.a}</p>
                 </div>
               ))}
             </div>
