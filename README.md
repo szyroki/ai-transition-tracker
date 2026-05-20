@@ -13,3 +13,13 @@ Shared for transparency, not as a template. The content (months, tasks, resource
 ## Stack
 
 React + Vite + Tailwind CSS, deployed at [ai-transition-tracker.netlify.app](https://ai-transition-tracker.netlify.app). Progress syncs across devices via Firebase Firestore with Google Sign-In.
+
+## Firebase rules
+
+The app expects Firestore data to be private per signed-in user:
+
+```js
+match /users/{userId}/data/{document=**} {
+  allow read, write: if request.auth != null && request.auth.uid == userId;
+}
+```

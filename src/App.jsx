@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import {
   CheckCircle2,
   Circle,
@@ -15,7 +15,6 @@ import {
   BarChart3,
   Cloud,
   FileText,
-  CalendarDays,
   Sparkles,
   LogIn,
   LogOut,
@@ -300,10 +299,20 @@ const EMPTY_STATE = { done: {}, notes: {}, activeMonth: "m1" };
 function loadLocalState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : EMPTY_STATE;
+    return raw ? normalizeState(JSON.parse(raw)) : EMPTY_STATE;
   } catch {
     return EMPTY_STATE;
   }
+}
+
+function normalizeState(value) {
+  if (!value || typeof value !== "object") return EMPTY_STATE;
+
+  return {
+    done: value.done && typeof value.done === "object" ? value.done : {},
+    notes: value.notes && typeof value.notes === "object" ? value.notes : {},
+    activeMonth: months.some((m) => m.id === value.activeMonth) ? value.activeMonth : "m1",
+  };
 }
 
 function ProgressBar({ value, accent = "from-sky-500 to-cyan-400" }) {
@@ -371,7 +380,9 @@ export default function App() {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   // Listen to auth state and load/upload Firestore data on sign-in
   useEffect(() => {
@@ -383,7 +394,7 @@ export default function App() {
           const ref = doc(db, "users", firebaseUser.uid, "data", "progress");
           const snap = await getDoc(ref);
           if (snap.exists()) {
-            const cloudState = snap.data();
+            const cloudState = normalizeState(snap.data());
             setState(cloudState);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudState));
           } else {
@@ -468,12 +479,7 @@ export default function App() {
     reader.onload = () => {
       try {
         const imported = JSON.parse(reader.result);
-        if (!imported || typeof imported !== "object") throw new Error("Invalid file.");
-        const safeState = {
-          done: imported.done && typeof imported.done === "object" ? imported.done : {},
-          notes: imported.notes && typeof imported.notes === "object" ? imported.notes : {},
-          activeMonth: months.some((m) => m.id === imported.activeMonth) ? imported.activeMonth : "m1",
-        };
+        const safeState = normalizeState(imported);
         setState(safeState);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(safeState));
         alert("Progress imported successfully.");
